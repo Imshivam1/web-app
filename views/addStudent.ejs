@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student</title>
+</head>
+<body>
+    <h1>Add Student</h1>
+    <form action="/api/students" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        <label for="college">College:</label>
+        <input type="text" id="college" name="college">
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="placed">Placed</option>
+            <option value="not_placed">Not Placed</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
