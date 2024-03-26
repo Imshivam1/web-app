@@ -1,5 +1,5 @@
 // controllers/studentController.js
-const Student = require('../src/models/Student');
+const Student = require('../models/student');
 
 // Controller functions
 // Example: Get all students

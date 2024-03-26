@@ -1,5 +1,5 @@
 // controllers/jobController.js
-const Job = require('../src/models/Job');
+const Job = require('../models/Job');
 
 // Controller functions
 // Example: Get all jobs

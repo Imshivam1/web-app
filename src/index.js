@@ -1,8 +1,11 @@
+// index.js
+
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
-const connectDB = require('./db'); // Import the database connection
+const connectDB = require('./models/db'); // Import the database connection
 const routes = require('./routes'); // Import central routes file
+const authRoutes = require('./routes/authRoutes'); // Import auth routes
 const models = require('./models'); // Import models
 
 dotenv.config();
@@ -18,9 +21,12 @@ connectDB();
 
 // Setting up routes with correct paths
 app.use('/api', routes); // Use the central routes file
+app.use('/auth', authRoutes); // Use auth routes
 
 // Access models
 console.log(models.Interview); // Example usage
+console.log('MONGODB_URI:', process.env.MONGODB_URI); //example use
+
 
 // Error handling middleware
 app.use((req, res, next) => {
