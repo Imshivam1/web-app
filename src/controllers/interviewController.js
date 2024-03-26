@@ -1,5 +1,5 @@
 // controllers/interviewController.js
-const Interview = require('../models/Interview');
+const Interview = require('../src/models/Interview');
 
 // Controller functions
 // Example: Get all interviews

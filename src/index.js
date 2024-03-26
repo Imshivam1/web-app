@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 const connectDB = require('./db'); // Import the database connection
-const routes = require('./routes'); // Import central routes file
-const models = require('./models'); // Import models
+const routes = require('./src/routes'); // Import central routes file
+const models = require('./src/models'); // Import models
 
 dotenv.config();
 const app = express();
