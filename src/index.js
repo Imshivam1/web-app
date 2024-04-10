@@ -25,8 +25,6 @@ connectDB();
 app.use('/api', routes); // Use the central routes file
 app.use('/auth', authRoutes); // Use auth routes
 
-// Access models
-console.log(models.Interview); // Example usage
 
 // Error handling middleware
 app.use((req, res, next) => {

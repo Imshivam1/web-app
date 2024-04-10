@@ -1,25 +1,28 @@
-// models/db.js
+// db.js
 
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-// Load MongoDB URI from environment variables
-const uri = process.env.MONGODB_URI;
-
-const clientOptions = {
-  serverApi: { version: '1', strict: true, deprecationErrors: true }
-};
+console.log('Loaded .env file'); // Added for verification
 
 async function connectDB() {
-  try {
-    if (!uri) {
-      throw new Error('MONGODB_URI environment variable is not defined');
+    try {
+        const uri = process.env.MONGODB_URI;
+        if (!uri) {
+            throw new Error('MONGODB_URI environment variable is not defined');
+        }
+        await mongoose.connect(uri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+        process.exit(1);
     }
-    await mongoose.connect(uri, clientOptions);
-    console.log('Connected to MongoDB');
-  } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
-    process.exit(1);
-  }
 }
+
+// Log all environment variables for debugging
+console.log('Environment variables:', process.env);
 
 module.exports = connectDB;
