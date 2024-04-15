@@ -23,6 +23,6 @@ async function connectDB() {
 }
 
 // Log all environment variables for debugging
-console.log('Environment variables:', process.env);
+//console.log('Environment variables:', process.env);
 
 module.exports = connectDB;
