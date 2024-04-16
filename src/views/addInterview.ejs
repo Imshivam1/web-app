@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Interview</title>
+</head>
+<body>
+    <h1>Add Interview</h1>
+    <form id="interviewForm">
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date">
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('interviewForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get form data
+            const formData = new FormData(this);
+
+            // Convert form data to JSON
+            const interviewData = {};
+            formData.forEach((value, key) => {
+                interviewData[key] = value;
+            });
+
+            // Make POST request to backend
+            fetch('/api/interviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(interviewData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Interview added successfully:', data);
+                // Optionally, you can redirect the user to another page or display a success message
+            })
+            .catch(error => {
+                console.error('There was a problem adding the interview:', error);
+                // Optionally, you can display an error message to the user
+            });
+        });
+    </script>
+</body>
+</html>

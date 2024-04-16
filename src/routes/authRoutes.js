@@ -2,30 +2,27 @@
 
 const express = require('express');
 const router = express.Router();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient } = require('mongodb');
+const bcrypt = require('bcrypt');
+require('dotenv').config(); // Load environment variables
 
 // MongoDB connection URI
-const uri = "mongodb+srv://imshivam1:<imshivam1>@imshivam1.7ojg8if.mongodb.net/?retryWrites=true&w=majority&appName=imshivam1";
+const uri = process.env.MONGODB_URI; // Use environment variable
+const dbName = process.env.DB_NAME; // Use environment variable
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
+// Create a MongoClient instance
+const client = new MongoClient(uri);
 
 // Authentication endpoint
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
     // Connect the client to the MongoDB server
     await client.connect();
 
     // Assuming you have a 'users' collection in your MongoDB database
-    const usersCollection = client.db("imshivam1").collection("users");
+    const usersCollection = client.db(dbName).collection("users");
 
     // Check if the user exists in the database
     const user = await usersCollection.findOne({ username });
@@ -34,9 +31,10 @@ router.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if the password matches
-    if (user.password !== password) {
-      return res.status(401).json({ message: 'Invalid password' });
+    // Compare hashed passwords
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ message: 'Invalid username or password' });
     }
 
     // Authentication successful
