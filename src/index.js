@@ -5,7 +5,6 @@ const path = require('path');
 const dotenv = require('dotenv'); // Import dotenv package
 const connectDB = require('./models/db'); // Import the database connection
 const routes = require('./routes'); // Import central routes file
-const authRoutes = require('./routes/authRoutes'); // Import auth routes
 const models = require('./models'); // Import models
 
 // Load environment variables from .env file
@@ -23,8 +22,6 @@ connectDB();
 
 // Setting up routes with correct paths
 app.use('/api', routes); // Use the central routes file
-app.use('/auth', authRoutes); // Use auth routes
-
 
 // Error handling middleware
 app.use((req, res, next) => {
