@@ -20,8 +20,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Connect to MongoDB
 connectDB();
 
+// Setting up view engine and views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 // Setting up routes with correct paths
 app.use('/api', routes); // Use the central routes file
+
+// Route to render the home page
+app.get('/', (req, res) => {
+    // You can pass data to the view if needed
+    res.render('home', { title: 'Home Page' });
+});
 
 // Error handling middleware
 app.use((req, res, next) => {
