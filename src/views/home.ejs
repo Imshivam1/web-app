@@ -7,11 +7,22 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <style>
+        /* Custom CSS for scaling transform */
+        .nav-link {
+            transition: transform 0.3s ease-in-out; /* Apply smooth transition */
+        }
+        .nav-link:hover {
+            transform: scale(1.1); /* Scale up by 10% when hovered */
+            color: crimson;
+            text-decoration: underline;
+        }
+    </style>
 </head>
-<body>
-    <h1 class="text-dark">Welcome to the JobShop</h1>
-    <nav class="navbar navbar-expand-lg navbar-light bg-lightblue">
+<body class="bg-dark">
+    <h1 class="text-light text-center">Welcome to the JobShop</h1>
+    <nav class="navbar navbar-expand-lg navbar-light bg-info">
         <div class="container">
             <a class="navbar-brand" href="#">JobShop</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,10 +31,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/home">Home</a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/addInterview">Add Interview</a>
+                        <a class="nav-link" href="/addInterviews">Add Interview</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/addStudent">Add Student</a>
@@ -45,6 +56,7 @@
     <!-- Bootstrap JS (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!-- Custom JavaScript -->
-    <script src="/js/script.js"></script>
+    <script src="/public/js/script.js"></script>
 </body>
 </html>
+o

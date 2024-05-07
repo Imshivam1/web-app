@@ -33,6 +33,10 @@ app.get('/', (req, res) => {
     res.render('home', { title: 'Home Page' });
 });
 
+app.get('/addInterviews', (req, res) => {
+    res.render('addInterview');
+  });
+
 // Error handling middleware
 app.use((req, res, next) => {
     const error = new Error('Not Found');
