@@ -68,7 +68,12 @@
             </div>
             <div class="mb-3">
                 <label for="batch" class="form-label">Batch:</label>
-                <input type="number" class="form-control" id="batch" name="batch" required>
+                <select class="form-select" id="batch" name="batch" required>
+                    <!-- Assume batch range is from 2020 to 2030 -->
+                    <% for (let year = 2020; year <= 2030; year++) { %>
+                        <option value="<%= year %>"><%= year %></option>
+                    <% } %>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="dsaScore" class="form-label">DSA Final Score:</label>

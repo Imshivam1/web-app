@@ -8,6 +8,7 @@ const Student = require('./models/student');
 const Job = require('./models/Job');
 const jobRoutes = require('./routes/jobRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const authRoutes = require('./routes/authRoutes'); 
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/api', routes);
 app.use('/jobs', jobRoutes);
 app.use('/students', studentRoutes);
+app.use('/', authRoutes);
 
 // Home route
 app.get('/', (req, res) => {
