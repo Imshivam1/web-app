@@ -49,20 +49,26 @@
         </div>
     </nav>
     <div class="container mt-5">
-        <table class="table">
-            <thead class="table-dark">
+        <table class="table table-dark table-striped">
+            <thead>
                 <tr>
                     <th scope="col">Company</th>
                     <th scope="col">Date</th>
-                    <!-- Add more columns as needed -->
+                    <th scope="col">Actions</th> <!-- New column for actions -->
                 </tr>
             </thead>
             <tbody>
                 <% interview_list.forEach(interview => { %>
                     <tr>
                         <td><%= interview.company %></td>
-                        <td><%= interview.date %></td>
-                        <!-- Add more columns as needed -->
+                        <td><%= new Date(interview.date).toISOString().split('T')[0] %></td>
+                        <td>
+                            <!-- Delete Button -->
+                            <form action="/interviews/delete" method="POST" style="display: inline;">
+                                <input type="hidden" name="interviewId" value="<%= interview._id %>">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 <% }); %>
             </tbody>

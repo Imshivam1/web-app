@@ -50,13 +50,17 @@
         </div>
     </nav>
     <div class="container mt-5">
-        <table class="table">
-            <thead class="table-dark">
+        <table class="table table-dark table-striped">
+            <thead>
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">College</th>
                     <th scope="col">Status</th>
-                    <!-- Add more columns as needed -->
+                    <th scope="col">Batch</th>
+                    <th scope="col">DSA Score</th>
+                    <th scope="col">WebD Score</th>
+                    <th scope="col">React Score</th>
+                    <th scope="col">Actions</th> <!-- New column for actions -->
                 </tr>
             </thead>
             <tbody>
@@ -65,7 +69,17 @@
                         <td><%= student.name %></td>
                         <td><%= student.college %></td>
                         <td><%= student.status %></td>
-                        <!-- Add more columns as needed -->
+                        <td><%= student.batch %></td>
+                        <td><%= student.courseScores ? student.courseScores.dsaScore : 'N/A' %></td>
+                        <td><%= student.courseScores ? student.courseScores.webDScore : 'N/A' %></td>
+                        <td><%= student.courseScores ? student.courseScores.reactScore : 'N/A' %></td>
+                        <td>
+                            <!-- Delete Button -->
+                            <form action="/students/delete" method="POST" style="display: inline;">
+                                <input type="hidden" name="studentId" value="<%= student._id %>">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 <% }); %>
             </tbody>

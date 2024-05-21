@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Student</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Custom CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/public/css/style.css">
     <style>
-        /* Custom CSS for scaling transform */
         .nav-link {
-            transition: transform 0.3s ease-in-out; /* Apply smooth transition */
+            transition: transform 0.3s ease-in-out;
         }
         .nav-link:hover {
-            transform: scale(1.1); /* Scale up by 10% when hovered */
+            transform: scale(1.1);
             color: crimson;
             text-decoration: underline;
         }
@@ -69,12 +66,24 @@
                     <option value="Not Placed">Not Placed</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <div id="message" class="mt-3"></div>
+            <div class="mb-3">
+                <label for="batch" class="form-label">Batch:</label>
+                <input type="number" class="form-control" id="batch" name="batch" required>
+            </div>
+            <div class="mb-3">
+                <label for="dsaScore" class="form-label">DSA Final Score:</label>
+                <input type="number" class="form-control" id="dsaScore" name="dsaScore" required>
+            </div>
+            <div class="mb-3">
+                <label for="webDScore" class="form-label">WebD Final Score:</label>
+                <input type="number" class="form-control" id="webDScore" name="webDScore" required>
+            </div>
+            <div class="mb-3">
+                <label for="reactScore" class="form-label">React Final Score:</label>
+                <input type="number" class="form-control" id="reactScore" name="reactScore" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Student</button>
         </form>
     </div>
-
-    <!-- Bootstrap JS (optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -53,12 +53,16 @@
         </div>
     </nav>
     <div class="container mt-5">
+        <!-- Add Job Button -->
+        <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addJobModal">Add Job</button>
+        
         <table class="table">
             <thead class="table-dark">
                 <tr>
-                    <th scope="col">Title</th>
+                    <th scope="col">Designation</th>
                     <th scope="col">Location</th>
                     <!-- Add more columns as needed -->
+                    <th scope="col">Actions</th> <!-- New column for edit/delete buttons -->
                 </tr>
             </thead>
             <tbody>
@@ -68,18 +72,42 @@
                         <td><%= job.location %></td>
                         <!-- Add more columns as needed -->
                         <td>
-                            <!-- Edit Button -->
-                            <a href="/jobs/edit/<%= job._id %>" class="btn btn-primary">Edit</a>
                             <!-- Delete Button -->
-                            <form action="/jobs/delete/<%= job._id %>" method="POST" style="display: inline;">
+                            <form action="/jobs/delete" method="POST" style="display: inline;">
+                                <input type="hidden" name="jobId" value="<%= job._id %>">
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
                         </td>
                     </tr>
                 <% }); %>
             </tbody>
-            
         </table>
+    </div>
+
+    <!-- Add Job Modal -->
+    <div class="modal fade" id="addJobModal" tabindex="-1" aria-labelledby="addJobModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addJobModalLabel">Add Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to add job -->
+                    <form action="/jobs/add" method="POST">
+                        <div class="mb-3">
+                            <label for="jobTitle" class="form-label">Job Role</label>
+                            <input type="text" class="form-control" id="jobTitle" name="title" placeholder="Enter job role" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="jobLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="jobLocation" name="location" placeholder="Enter job location" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS (optional) -->
