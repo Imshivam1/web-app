@@ -1,9 +1,12 @@
 // routes/studentRoutes.js
 const express = require('express');
 const router = express.Router();
-const studentController = require('../controllers/studentController');
 
-// Define routes
-router.get('/', studentController.getAllStudents);
+// Route to render the Add Student page
+router.get('/addStudent', (req, res) => {
+    res.render('addStudent');
+});
+
+// Other student-related routes
 
 module.exports = router;
