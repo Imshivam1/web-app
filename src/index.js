@@ -10,6 +10,10 @@ const jobRoutes = require('./routes/jobRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const authRoutes = require('./routes/authRoutes'); 
 const interviewRoutes = require('./routes/interviewRoutes');
+const passport = require('passport');
+const session = require('express-session');
+const flash = require('connect-flash');
+const passportConfig = require('./config/passportConfig');
 
 dotenv.config();
 
@@ -19,6 +23,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+// Configure Passport
+passportConfig(passport);
 
 // Connect to database
 connectDB();

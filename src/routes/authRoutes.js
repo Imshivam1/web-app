@@ -1,57 +1,70 @@
-// authRoutes.js
-
 const express = require('express');
+const passport = require('passport');
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const { MongoClient } = require('mongodb');
-require('dotenv').config(); // Load environment variables
 
-// MongoDB connection URI
-const uri = process.env.MONGODB_URI; // Use environment variable
-const dbName = process.env.DB_NAME; // Use environment variable
-
-// Create a MongoClient instance
-const client = new MongoClient(uri);
-
-// Serve the login page
+// Local auth routes
 router.get('/login', (req, res) => {
-  res.render('login');
+    res.render('login', { message: req.flash('error') });
+});
+router.post('/login', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+router.get('/signup', (req, res) => {
+    res.render('signup');
+});
+router.post('/signup', (req, res) => {
+    User.register(new User({ username: req.body.username }), req.body.password, (err, user) => {
+        if (err) {
+            return res.render('signup', { error: err.message });
+        }
+        passport.authenticate('local')(req, res, () => {
+            res.redirect('/');
+        });
+    });
+});
+router.get('/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/');
+    });
 });
 
-// Authentication endpoint
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+// Google auth routes
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google/callback', passport.authenticate('google', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+}));
 
-    try {
-        // Connect the client to the MongoDB server
-        await client.connect();
+// Facebook auth routes
+router.get('/auth/facebook', passport.authenticate('facebook'));
+router.get('/auth/facebook/callback', passport.authenticate('facebook', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+}));
 
-        // Assuming you have a 'users' collection in your MongoDB database
-        const usersCollection = client.db(dbName).collection("users");
-
-        // Check if the user exists in the database
-        const user = await usersCollection.findOne({ username });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Compare hashed passwords
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            return res.status(401).json({ message: 'Invalid username or password' });
-        }
-
-        // Authentication successful
-        res.status(200).json({ message: 'Authentication successful', user });
-
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    } finally {
-        // Close the MongoDB connection
-        await client.close();
-    }
+// Magic Link auth routes
+router.get('/auth/magic-link', (req, res) => {
+    res.render('magic-link');
 });
+router.post('/auth/magic-link', passport.authenticate('magiclink', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+}));
+router.get('/auth/magic-link/callback', passport.authenticate('magiclink', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+}));
+
+// Auth0 auth routes
+router.get('/auth/auth0', passport.authenticate('auth0', { scope: 'openid email profile' }));
+router.get('/auth/auth0/callback', passport.authenticate('auth0', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+}));
 
 module.exports = router;
