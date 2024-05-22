@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body class="bg-dark text-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between mb-3">
+            <a href="/interviews" class="btn btn-primary">Back to Interviews</a>
+            <a href="/" class="btn btn-primary">Home</a>
+        </div>
+        <h1>Interview at <%= interview.company %></h1>
+        <p>Date: <%= new Date(interview.date).toISOString().split('T')[0] %></p>
+        
+        <h2>Allocated Students</h2>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>College</th>
+                    <th>Status</th>
+                    <th>Result</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% interview.allocatedStudents.forEach(allocation => { %>
+                    <tr>
+                        <td><%= allocation.student.name %></td>
+                        <td><%= allocation.student.college %></td>
+                        <td><%= allocation.student.status %></td>
+                        <td><%= allocation.result %></td>
+                        <td>
+                            <form action="/interviews/mark-result" method="POST">
+                                <input type="hidden" name="interviewId" value="<%= interview._id %>">
+                                <input type="hidden" name="studentId" value="<%= allocation.student._id %>">
+                                <select name="result" class="form-select">
+                                    <option value="PASS" <%= allocation.result === 'PASS' ? 'selected' : '' %>>PASS</option>
+                                    <option value="FAIL" <%= allocation.result === 'FAIL' ? 'selected' : '' %>>FAIL</option>
+                                    <option value="On Hold" <%= allocation.result === 'On Hold' ? 'selected' : '' %>>On Hold</option>
+                                    <option value="Didn’t Attempt" <%= allocation.result === 'Didn’t Attempt' ? 'selected' : '' %>>Didn’t Attempt</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary mt-2">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h2>Allocate Student</h2>
+        <form action="/interviews/allocate" method="POST" class="mt-3">
+            <input type="hidden" name="interviewId" value="<%= interview._id %>">
+            <div class="mb-3">
+                <label for="studentId" class="form-label">Student</label>
+                <select id="studentId" name="studentId" class="form-select" required>
+                    <% students.forEach(student => { %>
+                        <option value="<%= student._id %>"><%= student.name %> - <%= student.college %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Allocate Student</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

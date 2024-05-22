@@ -9,6 +9,7 @@ const Job = require('./models/Job');
 const jobRoutes = require('./routes/jobRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const authRoutes = require('./routes/authRoutes'); 
+const interviewRoutes = require('./routes/interviewRoutes');
 
 dotenv.config();
 
@@ -80,6 +81,25 @@ app.get('/interviews', async (req, res) => {
     }
 });
 
+// Fetch and render interview details including allocated students
+app.get('/interviews/:id', async (req, res) => {
+    try {
+        const interview = await Interview.findById(req.params.id)
+            .populate('allocatedStudents.student')
+            .exec();
+        const students = await Student.find({}); // Fetch all students
+
+        if (!interview) {
+            return res.status(404).send('Interview not found');
+        }
+
+        res.render('viewInterview', { interview, students });
+    } catch (error) {
+        console.error('Error fetching interview details:', error);
+        res.status(500).send('Error fetching interview details: ' + error.message);
+    }
+});
+
 // Add new interview
 app.post('/interviews/add', async (req, res) => {
     try {
@@ -93,11 +113,10 @@ app.post('/interviews/add', async (req, res) => {
     }
 });
 
-// Add new student
 app.post('/students/add', async (req, res) => {
     try {
-        const { name, college, status, batch } = req.body;
-        const newStudent = new Student({ name, college, status, batch });
+        const { name, college, status, batch, courseScores } = req.body;
+        const newStudent = new Student({ name, college, status, batch, courseScores });
         await newStudent.save();
         res.redirect('/students');
     } catch (error) {
@@ -105,6 +124,7 @@ app.post('/students/add', async (req, res) => {
         res.status(500).send('Error adding student: ' + error.message);
     }
 });
+
 
 // Handle form submission to add a new job
 app.post('/jobs/add', async (req, res) => {
@@ -158,6 +178,61 @@ app.post('/students/delete', async (req, res) => {
     } catch (err) {
         console.error('Error in deleting student: ', err);
         res.status(500).send('Error in deleting student: ' + err.message);
+    }
+});
+
+app.post('/interviews/allocate', async (req, res) => {
+    try {
+        const { interviewId, studentId } = req.body;
+        
+        // Find the interview
+        const interview = await Interview.findById(interviewId);
+        if (!interview) {
+            throw new Error('Interview not found');
+        }
+
+        // Find the student
+        const student = await Student.findById(studentId);
+        if (!student) {
+            throw new Error('Student not found');
+        }
+
+        // Add the student to the interview's allocated students
+        interview.allocatedStudents.push({ student: student._id });
+        await interview.save();
+
+        // Redirect back to the interview details page
+        res.redirect(`/interviews/${interviewId}`);
+    } catch (error) {
+        console.error('Error in allocating student:', error);
+        res.status(500).send('Error in allocating student: ' + error.message);
+    }
+});
+
+
+// Handle form submission to mark student result for an interview
+app.post('/interviews/mark-result', async (req, res) => {
+    try {
+        const { interviewId, studentId, result } = req.body;
+        const interview = await Interview.findById(interviewId);
+        const student = await Student.findById(studentId);
+
+        if (!interview || !student) {
+            return res.status(404).json({ message: 'Interview or Student not found' });
+        }
+
+        interview.allocatedStudents.forEach(allocation => {
+            if (allocation.student.equals(studentId)) {
+                allocation.result = result;
+            }
+        });
+
+        await interview.save();
+
+        res.redirect(`/interviews/${interviewId}`);
+    } catch (err) {
+        console.error('Error in marking result: ', err);
+        res.status(500).send('Error in marking result: ' + err.message);
     }
 });
 

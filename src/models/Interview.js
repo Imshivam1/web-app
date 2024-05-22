@@ -10,7 +10,11 @@ const interviewSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true
-    }
+    },
+    allocatedStudents: [{
+        student: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
+        result: { type: String, enum: ['PASS', 'FAIL', 'On Hold', 'Didn’t Attempt'], default: 'On Hold' }
+    }]
 });
 
 const Interview = mongoose.model('Interview', interviewSchema);

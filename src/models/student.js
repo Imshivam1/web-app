@@ -1,33 +1,12 @@
 const mongoose = require('mongoose');
 
-const courseScoresSchema = new mongoose.Schema({
-    dsaScore: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 100
-    },
-    webDScore: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 100
-    },
-    reactScore: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 100
-    }
-});
-
 const interviewSchema = new mongoose.Schema({
-    company: {
-        type: String,
-        required: true
-    },
     date: {
         type: Date,
+        required: true
+    },
+    company: {
+        type: String,
         required: true
     },
     result: {
@@ -56,7 +35,26 @@ const studentSchema = new mongoose.Schema({
         required: true
     },
     courseScores: {
-        type: courseScoresSchema,
+        type: {
+            dsaScore: {
+                type: Number,
+                required: true,
+                min: 0,
+                max: 100
+            },
+            webDScore: {
+                type: Number,
+                required: true,
+                min: 0,
+                max: 100
+            },
+            reactScore: {
+                type: Number,
+                required: true,
+                min: 0,
+                max: 100
+            }
+        },
         required: true
     },
     interviews: [interviewSchema]
