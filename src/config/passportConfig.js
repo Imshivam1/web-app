@@ -2,11 +2,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-const MagicLinkStrategy = require('passport-magic-link').Strategy;
+const MagicLoginStrategy = require('passport-magic-login').default
 const Auth0Strategy = require('passport-auth0');
-const User = require('../models/user');
 const nodemailer = require('nodemailer');
-
+const User = require('../models/user');
 // Configure local strategy
 passport.use(new LocalStrategy(User.authenticate()));
 
@@ -14,11 +13,28 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-    User.findOrCreate({ googleId: profile.id }, (err, user) => {
-        return done(err, user);
-    });
+    callbackURL: process.env.BASE_URL + '/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        let user = await User.findOne({ googleId: profile.id });
+
+        if (!user) {
+            const email = profile.emails[0].value;
+            const username = email.split('@')[0];
+
+            user = new User({
+                googleId: profile.id,
+                username: username,
+                email: email,
+            });
+
+            await user.save();
+        }
+
+        return done(null, user);
+    } catch (err) {
+        return done(err, null);
+    }
 }));
 
 // Configure Facebook strategy
@@ -32,38 +48,67 @@ passport.use(new FacebookStrategy({
     });
 }));
 
-// Configure Magic Link strategy
-passport.use(new MagicLinkStrategy({
+// Configure Magic Login strategy
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
+  }
+});
+
+const sendEmail = async ({ to, subject, body }) => {
+  await transporter.sendMail({
+    from: process.env.GMAIL_USER,
+    to,
+    subject,
+    text: body
+  });
+};
+
+module.exports = (passport) => {
+  const magicLogin = new MagicLoginStrategy({ // Using MagicLoginStrategy from passport-magic-login
     secret: process.env.MAGIC_LINK_SECRET,
-    userFields: ['email'],
-    tokenField: 'token',
-    sendToken: async (user, token) => { // Define the sendToken function
-        // Create a nodemailer transporter
-        const transporter = nodemailer.createTransport({
-            service: 'Gmail', // Or any other email service
-            auth: {
-                user: process.env.GMAIL_USER, // Your email username
-                pass: process.env.GMAIL_PASS // Your email password
-            }
-        });
-
-        // Define email options
-        const mailOptions = {
-            from: process.env.GMAIL_USER, // Sender email address
-            to: user.email, // Recipient email address
-            subject: 'Your Magic Link', // Email subject
-            text: `Click this link to sign in: ${process.env.BASE_URL}/auth/magic-link/callback?token=${token}` // Email body with the magic link
-        };
-
-        // Send the email
-        await transporter.sendMail(mailOptions);
+    callbackUrl: '/auth/magiclogin/callback',
+    sendMagicLink: async (destination, href) => {
+      await sendEmail({
+        to: destination,
+        subject: 'Your Magic Login Link',
+        body: `Click this link to finish logging in: ${process.env.BASE_URL}${href}`
+      });
     },
-    verifyUser: async (user, token) => {
-        const foundUser = await User.findOne({ email: user.email });
-        return foundUser || await User.create(user);
+    verify: async (payload, callback) => {
+      try {
+        let user = await User.findOne({ email: payload.destination });
+        if (!user) {
+          user = new User({ email: payload.destination });
+          await user.save();
+        }
+        return callback(null, user);
+      } catch (err) {
+        return callback(err);
+      }
+    },
+    jwtOptions: {
+      expiresIn: '2 days',
     }
-}));
+  });
 
+  passport.use(magicLogin);
+
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  });
+};
 
 // Configure Auth0 strategy
 passport.use(new Auth0Strategy({

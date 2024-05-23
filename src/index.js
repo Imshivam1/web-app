@@ -44,6 +44,24 @@ app.use('/jobs', jobRoutes);
 app.use('/students', studentRoutes);
 app.use('/', authRoutes);
 
+// Magic login routes
+app.post("/auth/magiclogin", passport.authenticate('magiclogin', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+app.get("/auth/magiclogin/callback", passport.authenticate('magiclogin', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+// Render the magic login page
+app.get('/magiclogin', (req, res) => {
+    res.render('magicLogin', { title: 'Magic Login' });
+});
+
 // Home route
 app.get('/', (req, res) => {
     res.render('home', { title: 'Home Page' });
@@ -136,7 +154,6 @@ app.post('/students/add', async (req, res) => {
     }
 });
 
-
 // Handle form submission to add a new job
 app.post('/jobs/add', async (req, res) => {
     try {
@@ -219,7 +236,6 @@ app.post('/interviews/allocate', async (req, res) => {
         res.status(500).send('Error in allocating student: ' + error.message);
     }
 });
-
 
 // Handle form submission to mark student result for an interview
 app.post('/interviews/mark-result', async (req, res) => {
