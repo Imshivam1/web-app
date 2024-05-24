@@ -14,6 +14,7 @@ const passport = require('passport');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passportConfig = require('./config/passportConfig');
+const { isAuthenticated } = require('./middleware/auth');
 
 dotenv.config();
 
@@ -40,9 +41,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 app.use('/api', routes);
-app.use('/jobs', jobRoutes);
-app.use('/students', studentRoutes);
+app.use('/jobs', isAuthenticated, jobRoutes);
+app.use('/students', isAuthenticated, studentRoutes);
 app.use('/', authRoutes);
+app.use('/interviews', isAuthenticated, interviewRoutes);
 
 // Magic login routes
 app.post("/auth/magiclogin", passport.authenticate('magiclogin', {
@@ -62,23 +64,34 @@ app.get('/magiclogin', (req, res) => {
     res.render('magicLogin', { title: 'Magic Login' });
 });
 
-// Home route
-app.get('/', (req, res) => {
-    res.render('home', { title: 'Home Page' });
+// Route for initiating Google OAuth authentication
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// Route for handling Google OAuth callback
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+    res.redirect('/');
 });
 
+
+// Home route
+app.get('/', (req, res) => {
+    res.render('home', { user: req.user });
+});
+
+
 // Interview routes
-app.get('/interviews/add', (req, res) => {
+app.get('/interviews/add', isAuthenticated, (req, res) => {
     res.render('addInterview');
 });
 
 // Student routes
-app.get('/students/add', (req, res) => {
+app.get('/students/add', isAuthenticated, (req, res) => {
     res.render('addStudent');
 });
 
+
 // Fetch and render job list
-app.get('/jobs/add', async (req, res) => {
+app.get('/jobs/add', isAuthenticated, async (req, res) => {
     try {
         const jobList = await Job.find({});
         res.render('jobList', { job_list: jobList });
@@ -89,7 +102,7 @@ app.get('/jobs/add', async (req, res) => {
 });
 
 // Fetch and render student list
-app.get('/students', async (req, res) => {
+app.get('/students', isAuthenticated, async (req, res) => {
     try {
         const studentList = await Student.find({});
         res.render('studentList', { student_list: studentList });
@@ -100,7 +113,7 @@ app.get('/students', async (req, res) => {
 });
 
 // Fetch and render interview list
-app.get('/interviews', async (req, res) => {
+app.get('/interviews', isAuthenticated, async (req, res) => {
     try {
         const interviewList = await Interview.find({});
         res.render('interviewList', { interview_list: interviewList });
@@ -111,7 +124,7 @@ app.get('/interviews', async (req, res) => {
 });
 
 // Fetch and render interview details including allocated students
-app.get('/interviews/:id', async (req, res) => {
+app.get('/interviews/:id', isAuthenticated, async (req, res) => {
     try {
         const interview = await Interview.findById(req.params.id)
             .populate('allocatedStudents.student')
@@ -130,7 +143,7 @@ app.get('/interviews/:id', async (req, res) => {
 });
 
 // Add new interview
-app.post('/interviews/add', async (req, res) => {
+app.post('/interviews/add', isAuthenticated, async (req, res) => {
     try {
         const { company, date } = req.body;
         const newInterview = new Interview({ company, date });
@@ -142,7 +155,8 @@ app.post('/interviews/add', async (req, res) => {
     }
 });
 
-app.post('/students/add', async (req, res) => {
+// Add new student
+app.post('/students/add', isAuthenticated, async (req, res) => {
     try {
         const { name, college, status, batch, courseScores } = req.body;
         const newStudent = new Student({ name, college, status, batch, courseScores });
@@ -155,7 +169,7 @@ app.post('/students/add', async (req, res) => {
 });
 
 // Handle form submission to add a new job
-app.post('/jobs/add', async (req, res) => {
+app.post('/jobs/add', isAuthenticated, async (req, res) => {
     try {
         const { title, location } = req.body;
         const newJob = new Job({ title, location });
@@ -168,7 +182,7 @@ app.post('/jobs/add', async (req, res) => {
 });
 
 // Handle form submission to delete a job
-app.post('/jobs/delete', async (req, res) => {
+app.post('/jobs/delete', isAuthenticated, async (req, res) => {
     try {
         if (!req.body.jobId) {
             throw new Error('Job ID is required for deletion.');
@@ -182,7 +196,7 @@ app.post('/jobs/delete', async (req, res) => {
 });
 
 // Handle form submission to delete an interview
-app.post('/interviews/delete', async (req, res) => {
+app.post('/interviews/delete', isAuthenticated, async (req, res) => {
     try {
         if (!req.body.interviewId) {
             throw new Error('Interview ID is required for deletion.');
@@ -196,7 +210,7 @@ app.post('/interviews/delete', async (req, res) => {
 });
 
 // Handle form submission to delete a student
-app.post('/students/delete', async (req, res) => {
+app.post('/students/delete', isAuthenticated, async (req, res) => {
     try {
         if (!req.body.studentId) {
             throw new Error('Student ID is required for deletion.');
@@ -209,10 +223,11 @@ app.post('/students/delete', async (req, res) => {
     }
 });
 
-app.post('/interviews/allocate', async (req, res) => {
+// Handle form submission to allocate a student to an interview
+app.post('/interviews/allocate', isAuthenticated, async (req, res) => {
     try {
         const { interviewId, studentId } = req.body;
-        
+
         // Find the interview
         const interview = await Interview.findById(interviewId);
         if (!interview) {
@@ -238,7 +253,7 @@ app.post('/interviews/allocate', async (req, res) => {
 });
 
 // Handle form submission to mark student result for an interview
-app.post('/interviews/mark-result', async (req, res) => {
+app.post('/interviews/mark-result', isAuthenticated, async (req, res) => {
     try {
         const { interviewId, studentId, result } = req.body;
         const interview = await Interview.findById(interviewId);
@@ -261,6 +276,17 @@ app.post('/interviews/mark-result', async (req, res) => {
         console.error('Error in marking result: ', err);
         res.status(500).send('Error in marking result: ' + err.message);
     }
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+    req.logout(err => {
+        if (err) {
+            return next(err);
+        }
+        req.flash('success_msg', 'You are logged out');
+        res.redirect('/login');
+    });
 });
 
 // Error handling middleware

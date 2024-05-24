@@ -52,6 +52,28 @@
                         <a class="nav-link" href="/interviews">View Interviews</a>
                     </li>
                 </ul>
+                <!-- Account dropdown -->
+<ul class="navbar-nav account-icon">
+    <% if (user) { %>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?w=1380&t=st=1716564938~exp=1716565538~hmac=6126e1daf76a9518e067887d5b5bf4a81824e9376b67b9d19816bc9be4a23810 alt="Profile Image" style="height: 24px; width: 24px;">
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><span class="dropdown-item-text"><%= user.email %></span></li>
+                <li><span class="dropdown-item-text"><%= user.username %></span></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+        </li>
+    <% } else { %>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+    <% } %>
+</ul>
+
+                
             </div>
         </div>
     </nav>

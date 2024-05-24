@@ -1,6 +1,6 @@
 const Interview = require('./Interview');
 const Job = require('./Job');
-const Student = require('./Student');
+const Student = require('./student');
 
 module.exports = {
     Interview,
