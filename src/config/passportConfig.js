@@ -9,6 +9,23 @@ const User = require('../models/user');
 // Configure local strategy
 passport.use(new LocalStrategy(User.authenticate()));
 
+// Password hashing middleware
+User.schema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        return next();
+    } catch (err) {
+        return next(err);
+    }
+});
+
+// Password comparison method
+User.schema.methods.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
+
 // Configure Google strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -126,19 +143,4 @@ passport.use(new Auth0Strategy({
         return done(err, user);
     });
 }));
-
-// Serialize user
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-// Deserialize user
-passport.deserializeUser(async (id, done) => {
-  try {
-      const user = await User.findById(id);
-      done(null, user);
-  } catch (error) {
-      done(error, false);
-  }
-});
 
