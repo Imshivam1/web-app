@@ -50,6 +50,7 @@
         </div>
     </nav>
     <div class="container mt-5">
+        <button id="downloadCsvBtn" class="btn btn-primary">Download CSV</button>
         <table class="table table-dark table-striped">
             <thead>
                 <tr>
@@ -86,5 +87,46 @@
         </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+            // Fetch student data from the server
+            fetch('/api/students')
+                .then(response => response.json())
+                .then(data => {
+                    // Convert student data to CSV format
+                    const csv = convertToCsv(data);
+    
+                    // Create a blob object from the CSV data
+                    const blob = new Blob([csv], { type: 'text/csv' });
+    
+                    // Create a temporary link element
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'student_data.csv';
+    
+                    // Simulate a click on the link to trigger the download
+                    link.click();
+                })
+                .catch(error => console.error('Error fetching student data:', error));
+        });
+    
+        // Function to convert JSON data to CSV format
+        function convertToCsv(data) {
+            const csvRows = [];
+            const headers = Object.keys(data[0]);
+            csvRows.push(headers.join(','));
+    
+            for (const student of data) {
+                const values = headers.map(header => {
+                    const escaped = ('' + student[header]).replace(/"/g, '\\"');
+                    return `"${escaped}"`;
+                });
+                csvRows.push(values.join(','));
+            }
+    
+            return csvRows.join('\n');
+        }
+    </script>
+    
 </body>
 </html>

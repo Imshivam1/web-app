@@ -15,6 +15,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passportConfig = require('./config/passportConfig');
 const { isAuthenticated, isEmployee } = require('./middleware/auth');
+const apiRoutes = require('./routes/apiRoutes');
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use('/', authRoutes);
 app.use('/interviews', isAuthenticated, interviewRoutes);
 app.use('/interviews', interviewRoutes);
 app.use('/jobs', jobRoutes);
+app.use('/api', apiRoutes);
 
 // Magic login routes
 app.post("/auth/magiclogin", passport.authenticate('magiclogin', {
