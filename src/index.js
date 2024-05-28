@@ -14,7 +14,7 @@ const passport = require('passport');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passportConfig = require('./config/passportConfig');
-const { isAuthenticated } = require('./middleware/auth');
+const { isAuthenticated, isEmployee } = require('./middleware/auth');
 
 dotenv.config();
 
@@ -45,6 +45,8 @@ app.use('/jobs', isAuthenticated, jobRoutes);
 app.use('/students', isAuthenticated, studentRoutes);
 app.use('/', authRoutes);
 app.use('/interviews', isAuthenticated, interviewRoutes);
+app.use('/interviews', interviewRoutes);
+app.use('/jobs', jobRoutes);
 
 // Magic login routes
 app.post("/auth/magiclogin", passport.authenticate('magiclogin', {
@@ -78,6 +80,10 @@ app.get('/', (req, res) => {
     res.render('home', { user: req.user });
 });
 
+// Route that requires employee authorization
+app.get('/employees-only', isEmployee, (req, res) => {
+    res.send('Welcome, employee!');
+});
 
 // Interview routes
 app.get('/interviews/add', isAuthenticated, (req, res) => {
@@ -87,18 +93,6 @@ app.get('/interviews/add', isAuthenticated, (req, res) => {
 // Student routes
 app.get('/students/add', isAuthenticated, (req, res) => {
     res.render('addStudent');
-});
-
-
-// Fetch and render job list
-app.get('/jobs/add', isAuthenticated, async (req, res) => {
-    try {
-        const jobList = await Job.find({});
-        res.render('jobList', { job_list: jobList });
-    } catch (error) {
-        console.error('Error fetching job data:', error);
-        res.status(500).send('Error fetching job data: ' + error.message);
-    }
 });
 
 // Fetch and render student list
@@ -112,8 +106,70 @@ app.get('/students', isAuthenticated, async (req, res) => {
     }
 });
 
+// Add new student
+app.post('/students/add', isAuthenticated, async (req, res) => {
+    try {
+        const { name, college, status, batch, courseScores } = req.body;
+        const newStudent = new Student({ name, college, status, batch, courseScores });
+        await newStudent.save();
+        res.redirect('/students');
+    } catch (error) {
+        console.error('Error adding student:', error);
+        res.status(500).send('Error adding student: ' + error.message);
+    }
+});
+
+// Handle form submission to delete a student
+app.post('/students/delete', isAuthenticated, async (req, res) => {
+    try {
+        if (!req.body.studentId) {
+            throw new Error('Student ID is required for deletion.');
+        }
+        await Student.findByIdAndDelete(req.body.studentId);
+        res.redirect('/students');
+    } catch (err) {
+        console.error('Error in deleting student: ', err);
+        res.status(500).send('Error in deleting student: ' + err.message);
+    }
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+    req.logout(err => {
+        if (err) {
+            return next(err);
+        }
+        req.flash('success_msg', 'You are logged out');
+        res.redirect('/login');
+    });
+});
+
+// Error handling middleware
+app.use((req, res, next) => {
+    const error = new Error('Not Found');
+    error.status = 404;
+    next(error);
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+        message: err.message,
+        error: process.env.NODE_ENV === 'development' ? err : {}
+    });
+});
+
+// Server setup
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+
+//earlier use of my routes please ignore the below commented area
+
 // Fetch and render interview list
-app.get('/interviews', isAuthenticated, async (req, res) => {
+/*app.get('/interviews', isAuthenticated, async (req, res) => {
     try {
         const interviewList = await Interview.find({});
         res.render('interviewList', { interview_list: interviewList });
@@ -153,50 +209,10 @@ app.post('/interviews/add', isAuthenticated, async (req, res) => {
         console.error('Error adding interview:', error);
         res.status(500).send('Error adding interview: ' + error.message);
     }
-});
-
-// Add new student
-app.post('/students/add', isAuthenticated, async (req, res) => {
-    try {
-        const { name, college, status, batch, courseScores } = req.body;
-        const newStudent = new Student({ name, college, status, batch, courseScores });
-        await newStudent.save();
-        res.redirect('/students');
-    } catch (error) {
-        console.error('Error adding student:', error);
-        res.status(500).send('Error adding student: ' + error.message);
-    }
-});
-
-// Handle form submission to add a new job
-app.post('/jobs/add', isAuthenticated, async (req, res) => {
-    try {
-        const { title, location } = req.body;
-        const newJob = new Job({ title, location });
-        await newJob.save();
-        res.redirect('/jobs/add');
-    } catch (error) {
-        console.error('Error adding job:', error);
-        res.status(500).send('Error adding job: ' + error.message);
-    }
-});
-
-// Handle form submission to delete a job
-app.post('/jobs/delete', isAuthenticated, async (req, res) => {
-    try {
-        if (!req.body.jobId) {
-            throw new Error('Job ID is required for deletion.');
-        }
-        await Job.findByIdAndDelete(req.body.jobId);
-        res.redirect('/jobs/add');
-    } catch (err) {
-        console.error('Error in deleting job: ', err);
-        res.status(500).send('Error in deleting job: ' + err.message);
-    }
-});
+});*/
 
 // Handle form submission to delete an interview
-app.post('/interviews/delete', isAuthenticated, async (req, res) => {
+/*app.post('/interviews/delete', isAuthenticated, async (req, res) => {
     try {
         if (!req.body.interviewId) {
             throw new Error('Interview ID is required for deletion.');
@@ -207,24 +223,10 @@ app.post('/interviews/delete', isAuthenticated, async (req, res) => {
         console.error('Error in deleting interview: ', err);
         res.status(500).send('Error in deleting interview: ' + err.message);
     }
-});
-
-// Handle form submission to delete a student
-app.post('/students/delete', isAuthenticated, async (req, res) => {
-    try {
-        if (!req.body.studentId) {
-            throw new Error('Student ID is required for deletion.');
-        }
-        await Student.findByIdAndDelete(req.body.studentId);
-        res.redirect('/students');
-    } catch (err) {
-        console.error('Error in deleting student: ', err);
-        res.status(500).send('Error in deleting student: ' + err.message);
-    }
-});
+});*/
 
 // Handle form submission to allocate a student to an interview
-app.post('/interviews/allocate', isAuthenticated, async (req, res) => {
+/*app.post('/interviews/allocate', isAuthenticated, async (req, res) => {
     try {
         const { interviewId, studentId } = req.body;
 
@@ -276,36 +278,41 @@ app.post('/interviews/mark-result', isAuthenticated, async (req, res) => {
         console.error('Error in marking result: ', err);
         res.status(500).send('Error in marking result: ' + err.message);
     }
+});*/
+// Fetch and render job list
+/*app.get('/jobs/add', isAuthenticated, async (req, res) => {
+    try {
+        const jobList = await Job.find({});
+        res.render('jobList', { job_list: jobList });
+    } catch (error) {
+        console.error('Error fetching job data:', error);
+        res.status(500).send('Error fetching job data: ' + error.message);
+    }
+});*/
+// Handle form submission to add a new job
+/*app.post('/jobs/add', isAuthenticated, async (req, res) => {
+    try {
+        const { title, location } = req.body;
+        const newJob = new Job({ title, location });
+        await newJob.save();
+        res.redirect('/jobs/add');
+    } catch (error) {
+        console.error('Error adding job:', error);
+        res.status(500).send('Error adding job: ' + error.message);
+    }
 });
 
-// Logout route
-app.get('/logout', (req, res) => {
-    req.logout(err => {
-        if (err) {
-            return next(err);
+// Handle form submission to delete a job
+app.post('/jobs/delete', isAuthenticated, async (req, res) => {
+    try {
+        if (!req.body.jobId) {
+            throw new Error('Job ID is required for deletion.');
         }
-        req.flash('success_msg', 'You are logged out');
-        res.redirect('/login');
-    });
-});
+        await Job.findByIdAndDelete(req.body.jobId);
+        res.redirect('/jobs/add');
+    } catch (err) {
+        console.error('Error in deleting job: ', err);
+        res.status(500).send('Error in deleting job: ' + err.message);
+    }
+});*/
 
-// Error handling middleware
-app.use((req, res, next) => {
-    const error = new Error('Not Found');
-    error.status = 404;
-    next(error);
-});
-
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(err.status || 500).json({
-        message: err.message,
-        error: process.env.NODE_ENV === 'development' ? err : {}
-    });
-});
-
-// Server setup
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
