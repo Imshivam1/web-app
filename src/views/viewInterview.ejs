@@ -29,23 +29,27 @@
             <tbody>
                 <% interview.allocatedStudents.forEach(allocation => { %>
                     <tr>
-                        <td><%= allocation.student.name %></td>
-                        <td><%= allocation.student.college %></td>
-                        <td><%= allocation.student.status %></td>
-                        <td><%= allocation.result %></td>
-                        <td>
-                            <form action="/interviews/mark-result" method="POST">
-                                <input type="hidden" name="interviewId" value="<%= interview._id %>">
-                                <input type="hidden" name="studentId" value="<%= allocation.student._id %>">
-                                <select name="result" class="form-select">
-                                    <option value="PASS" <%= allocation.result === 'PASS' ? 'selected' : '' %>>PASS</option>
-                                    <option value="FAIL" <%= allocation.result === 'FAIL' ? 'selected' : '' %>>FAIL</option>
-                                    <option value="On Hold" <%= allocation.result === 'On Hold' ? 'selected' : '' %>>On Hold</option>
-                                    <option value="Didn’t Attempt" <%= allocation.result === 'Didn’t Attempt' ? 'selected' : '' %>>Didn’t Attempt</option>
-                                </select>
-                                <button type="submit" class="btn btn-primary mt-2">Update</button>
-                            </form>
-                        </td>
+                        <% if (allocation.student) { %>
+                            <td><%= allocation.student.name %></td>
+                            <td><%= allocation.student.college %></td>
+                            <td><%= allocation.student.status %></td>
+                            <td><%= allocation.result %></td>
+                            <td>
+                                <form action="/interviews/mark-result" method="POST">
+                                    <input type="hidden" name="interviewId" value="<%= interview._id %>">
+                                    <input type="hidden" name="studentId" value="<%= allocation.student._id %>">
+                                    <select name="result" class="form-select">
+                                        <option value="PASS" <%= allocation.result === 'PASS' ? 'selected' : '' %>>PASS</option>
+                                        <option value="FAIL" <%= allocation.result === 'FAIL' ? 'selected' : '' %>>FAIL</option>
+                                        <option value="On Hold" <%= allocation.result === 'On Hold' ? 'selected' : '' %>>On Hold</option>
+                                        <option value="Didn’t Attempt" <%= allocation.result === 'Didn’t Attempt' ? 'selected' : '' %>>Didn’t Attempt</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary mt-2">Update</button>
+                                </form>
+                            </td>
+                        <% } else { %>
+                            <td colspan="5">No student allocated</td>
+                        <% } %>
                     </tr>
                 <% }); %>
             </tbody>

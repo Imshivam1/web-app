@@ -73,7 +73,7 @@ router.get('/auth/google/callback', passport.authenticate('google', {
 }));
 
 // Facebook auth routes
-router.get('/auth/facebook', passport.authenticate('facebook'));
+/*router.get('/auth/facebook', passport.authenticate('facebook'));
 router.get('/auth/facebook/callback', passport.authenticate('facebook', {
     successRedirect: '/',
     failureRedirect: '/login'
@@ -90,7 +90,7 @@ router.post('/auth/magic-link', passport.authenticate('magiclink', {
 router.get('/auth/magic-link/callback', passport.authenticate('magiclink', {
     successRedirect: '/',
     failureRedirect: '/login'
-}));
+}));*/
 
 // Auth0 auth routes
 router.get('/auth/auth0', passport.authenticate('auth0', { scope: 'openid email profile' }));
