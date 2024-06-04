@@ -1,6 +1,8 @@
 node_modules/
 .env
-.DS_Store
+# Ignore macOS system files
+../.DS_Store
+
 # Ignore Google Cloud CLI tarball
 ../google-cloud-cli-477.0.0-darwin-arm.tar.gz
 
@@ -9,4 +11,5 @@ node_modules/
 
 # Ignore Google Cloud SDK directory
 google-cloud-sdk/
+
 
