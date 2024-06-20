@@ -12,4 +12,6 @@ node_modules/
 # Ignore Google Cloud SDK directory
 google-cloud-sdk/
 
+# Ignore large files managed by Git LFS
+node-v22.3.0.pkg
 
