@@ -15,3 +15,11 @@ google-cloud-sdk/
 # Ignore large files managed by Git LFS
 node-v22.3.0.pkg
 
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# Ignore deployment ZIP files
+WebappCD.zip
