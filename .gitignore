@@ -1,22 +1,25 @@
+# Node.js dependencies
 node_modules/
+
+# Environment variables
 .env
-# Ignore macOS system files
-../.DS_Store
 
-# Ignore Google Cloud CLI tarball
-../google-cloud-cli-477.0.0-darwin-arm.tar.gz
+# macOS system files
+.DS_Store
 
-# Ignore GitHub workflow files
-../.github/
+# Google Cloud CLI tarball
+google-cloud-cli-477.0.0-darwin-arm.tar.gz
 
-# Ignore Google Cloud SDK directory
+# GitHub workflow files
+.github/
+
+# Google Cloud SDK directory
 google-cloud-sdk/
 
-# Ignore large files managed by Git LFS
+# Large files managed by Git LFS
 node-v22.3.0.pkg
 
-
-# Elastic Beanstalk Files
+# Elastic Beanstalk files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
