@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middleware/auth');
 
+module.exports = router;
 
 // Home route (accessible to everyone)
 router.get('/', (req, res) => {
@@ -31,4 +32,4 @@ router.use('/interviews', interviewRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/students', studentRoutes);
 
-module.exports = router;
+

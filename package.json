@@ -7,7 +7,7 @@
     "node": ">=21.7.1"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "build": "echo 'No build script needed for this app'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

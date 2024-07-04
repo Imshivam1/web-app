@@ -30,6 +30,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+// Logging middleware
+app.use((req, res, next) => {
+    console.log(`Request URL: ${req.url}`);
+    next();
+});
+
 // Configure Passport
 passportConfig(passport);
 
